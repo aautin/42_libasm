@@ -1,11 +1,13 @@
 NAME=libasm.a
 
-FILES=ft_strlen \
-	ft_strcpy \
-	ft_strcmp \
-	ft_write \
-	ft_read \
-	ft_strdup
+FILES=	ft_strlen \
+		ft_strcpy \
+		ft_strcmp \
+		ft_write \
+		ft_read \
+		ft_strdup
+
+MAIN_FILES=	main
 
 SRC_DIR=src
 SRC= $(addsuffix .asm, $(addprefix $(SRC_DIR)/, $(FILES)))
@@ -45,4 +47,4 @@ fclean: clean
 re: fclean $(NAME)
 
 $(TESTER): $(NAME) $(MAIN_OBJ)
-	gcc -g -o $@ $(MAIN_OBJ) -L. -lasm
+	gcc -fPIE -pie -g -o $@ $(MAIN_OBJ) -L. -lasm

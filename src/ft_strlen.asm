@@ -1,7 +1,7 @@
 section .text
-global strlen
+global ft_strlen
 
-strlen:
+ft_strlen:
 	push	rbp				; keep previous function rbp
 	mov		rbp, rsp
 
