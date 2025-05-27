@@ -5,7 +5,8 @@ FILES=	ft_strlen \
 		ft_strcmp \
 		ft_write \
 		ft_read \
-		ft_strdup
+		ft_strdup \
+		errno
 
 MAIN_FILES=	main
 
