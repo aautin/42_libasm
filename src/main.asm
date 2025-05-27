@@ -1,19 +1,30 @@
+extern ft_strlen
+extern printf
+
 section .data
 string:
-	db "My string has a length of 28", 0
+	db "Waouuuu", 0x0
+strlen_printf:
+	db "lenght of '%s': %d", 0xA, 0x0
 
 section .text
-extern strlen
 global main
 
 main:
 	push	rbp
 	mov		rbp, rsp
-	sub		rsp, 0x8
 
+	; ------ STRLEN ------
 	mov		rdi, string
-	call	strlen
+	call	ft_strlen
 
-	mov		rdi, rax
-	mov		rax, 0x3C
-	syscall
+	mov		rdi, strlen_printf
+	mov		rsi, string
+	mov		rdx, rax
+	mov		rax, printf
+	call	rax
+	; ------ STRLEN ------
+
+	xor eax, eax
+	leave
+	ret
