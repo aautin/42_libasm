@@ -9,9 +9,8 @@ strlen:
 	xor		rcx, rcx		; rcx = counter
 
 .loop:
-	cmp		byte [rsi], 0
+	cmp		byte [rsi + rcx], 0
 	je		.done
-	inc		rsi
 	inc		rcx
 	jmp		.loop
 
