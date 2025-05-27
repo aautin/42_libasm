@@ -19,7 +19,7 @@ MAIN_OBJ=$(OBJ_DIR)/main.o
 TESTER=tester
 
 CC= nasm
-CFLAGS= -f elf64
+CFLAGS= -f elf64 -g -F dwarf
 
 all: $(NAME)
 
@@ -40,9 +40,9 @@ clean:
 
 fclean: clean
 	rm -f $(NAME)
-
-re: fclean $(NAME)
 	rm -rf $(TESTER)
 
+re: fclean $(NAME)
+
 $(TESTER): $(NAME) $(MAIN_OBJ)
-	ld -o $@ $(MAIN_OBJ) -L. -lasm
+	gcc -g -o $@ $(MAIN_OBJ) -L. -lasm
