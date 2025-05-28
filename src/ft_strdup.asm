@@ -1,5 +1,4 @@
 extern malloc
-extern __ASSEMBLER__
 extern set_errno
 
 extern ft_strlen

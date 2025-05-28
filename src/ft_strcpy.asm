@@ -5,6 +5,8 @@ ft_strcpy:
 	push	rbp
 	mov		rbp, rsp
 
+	push	rdi
+
 .loop:
 	mov		al, byte [rsi]
 	mov		byte [rdi], al
@@ -17,6 +19,8 @@ ft_strcpy:
 	jmp		.loop
 
 .done:
+	pop		rdi
+
 	mov		rax, rdi
 	leave
 	ret
