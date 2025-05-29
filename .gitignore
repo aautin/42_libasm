@@ -1,3 +1,5 @@
 *.o
 *.a
 tester
+tester_bonus
+.vscode
