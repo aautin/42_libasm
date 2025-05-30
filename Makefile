@@ -38,6 +38,8 @@ CC= nasm
 CFLAGS= -f elf64 -g -F dwarf
 
 all: $(NAME)
+bonus: $(NAME_BONUS)
+.PHONY: all bonus clean fclean re
 
 $(NAME): $(OBJ_DIR) $(OBJ)
 	ar rcs $@ $(OBJ)
