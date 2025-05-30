@@ -38,28 +38,39 @@ ft_list_sort:
 	mov		qword [rbp - 0x28], rdi		; set second ptr (previous right operand)
 
 .sort_element:
-	mov		edi, dword [rbp - 0x18]
-	cmp		edi, dword [rbp - 0x14]		; cmp counter < sorting_loops_nb
-	jge		.sort_list
+    mov     edi, dword [rbp - 0x18]
+    cmp     edi, dword [rbp - 0x14]
+    jge     .sort_list
 
-	mov		rdi, qword [rbp - 0x28]
-	mov		rdi, qword [rdi + LIST_DATA]	; set rdi on second ptr data
+    ; Check if second_ptr->next == NULL
+    mov     rax, qword [rbp - 0x28]
+    mov     rax, qword [rax + LIST_NEXT]
+    test    rax, rax
+    je      .sort_list
 
-	mov		rsi, qword [rbp - 0x28]
-	mov		rsi, qword [rsi + LIST_NEXT]
-	mov		rsi, qword [rsi + LIST_DATA]	; set rsi on second ptr next data
+    ; set rdi on second_ptr->data
+    mov     rdi, qword [rbp - 0x28]
+    mov     rdi, qword [rdi + LIST_DATA]
 
-	call	qword [rbp - 0x10]
+    ; set rsi on second_ptr->next->data
+    mov     rsi, qword [rbp - 0x28]
+    mov     rsi, qword [rsi + LIST_NEXT]
+    mov     rsi, qword [rsi + LIST_DATA]
+
+    call    qword [rbp - 0x10]
 
 	cmp		eax, 0
 	jg		.swap							; swap if second data greater than first
 
+
+.sort_element_done:
 	; mov the 2 pointers forward
 	mov		rdi, qword [rbp - 0x28]
 	mov		rsi, qword [rbp - 0x28]			; first ptr = second ptr
 	mov		rsi, qword [rsi + LIST_NEXT]	; second ptr = second ptr -> next
+	mov		qword [rbp - 0x20], rdi
+	mov		qword [rbp - 0x28], rsi
 
-.sort_element_done:
 	inc		dword [rbp - 0x18]
 	jmp		.sort_element
 
@@ -88,8 +99,6 @@ ft_list_sort:
 	; make left operand next point on the saved right operand next
 	mov		r12, qword [rbp - 0x28]
 	mov		qword [r12 + LIST_NEXT], rdx
-
-	; make previous ptr point on right operand
 
 .swap_then2:
 	; mov the 2 pointers forward
