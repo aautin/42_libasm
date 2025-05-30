@@ -3,11 +3,10 @@
 ; 	void			*data;
 ; 	struct s_list	*next;
 ; }	t_list;
+; void	ft_list_sort(t_list** list, int (*cmp)())
 
 LIST_DATA equ 0x0
 LIST_NEXT equ 0x8
-
-; void	ft_list_sort(t_list** list, int (*cmp)())
 
 extern ft_list_size
 
