@@ -74,7 +74,7 @@ fclean: clean
 re: fclean $(NAME)
 
 $(TESTER): $(NAME) $(MAIN_OBJ)
-	gcc -fPIE -pie -g -o $@ $(MAIN_OBJ) -L. -lasm
+	gcc -z noexecstack-fPIE -pie -g -o $@ $(MAIN_OBJ) -L. -lasm
 
 $(TESTER_BONUS): $(NAME_BONUS) $(MAIN_BONUS_OBJ)
-	gcc -fPIE -pie -g -o $@ $(MAIN_BONUS_OBJ) -L. -lasm_bonus
+	gcc -z noexecstack -fPIE -pie -g -o $@ $(MAIN_BONUS_OBJ) -L. -lasm_bonus
