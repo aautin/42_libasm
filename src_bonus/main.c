@@ -59,7 +59,8 @@ int	main(int argc, char** argv)
 	}
 
 	ft_list_sort(&list, (int (*)(void*, void*))strcmp);
-
+	printf("(Bubble Sort)\n");
+	
 	for (int i = 0; list != NULL; ++i) {
 		printf("[%d] %s\n", i, (char*)list->data);
 		list = ft_list_delone(list);
