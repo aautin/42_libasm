@@ -18,6 +18,8 @@ FILES_BONUS=	ft_list_push_front \
 
 MAIN_FILES=	main
 
+INC_DIR=inc
+
 SRC_DIR=src
 SRC= $(addsuffix .asm, $(addprefix $(SRC_DIR)/, $(FILES)))
 SRC_BONUS_DIR=src_bonus
@@ -55,7 +57,7 @@ $(OBJ_BONUS_DIR):
 obj/main.o: src/main.asm
 	$(CC) $(CFLAGS) -o $@ $<
 obj_bonus/main.o: src_bonus/main.c
-	gcc -fPIE -pie -g -c $^ -o $@
+	gcc -fPIE -pie -g -c $^ -o $@ -I$(INC_DIR)
 
 obj/%.o: src/%.asm
 	$(CC) $(CFLAGS) -o $@ $<
