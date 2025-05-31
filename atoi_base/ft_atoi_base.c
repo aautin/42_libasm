@@ -22,28 +22,27 @@ int ft_atoi_base(char* str, int base_length)
 
 	base[base_length] = '\0';
 
-	int i = 0;
 	int	result = 0;
 	int	sign = 1;
 
-	while (isspace(str[i]))
-		i++;
+	while (isspace(*str))
+		str++;
 
-	if (str[i] == '-')
+	if (*str == '-')
 	{
 		sign = -1;
-		i++;
+		str++;
 	}
 
-	while (str[i] != 0)
+	while (*str != 0)
 	{
-		int base_i = get_index(base, str[i]);
+		int base_i = get_index(base, *str);
 		if (base_i == -1)
 			break;
 
 		result *= base_length;
 		result += base_i;
-		i++;
+		str++;
 	}
 
 	return result * sign;
