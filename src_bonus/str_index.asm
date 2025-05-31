@@ -44,6 +44,16 @@ str_index:
 	cmp		dl, dh
 	je		.found
 
+	; if INDEX < 10 : don't check uppercase, loop again
+	cmp		rdi, 10
+	jl		.loop_end
+
+	; if to_upper(STRING[INDEX]) == TO_FIND : it's found
+	sub		dl, 'a' - 'A'
+	cmp		dl, dh
+	je		.found
+
+.loop_end:
 	; INDEX++ then loop again
 	inc		dword [rbp - INDEX]
 	jmp		.loop
