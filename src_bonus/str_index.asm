@@ -7,12 +7,6 @@ STR_LEN equ 0x10
 TO_FIND equ 0x14
 INDEX equ 0x18
 
-extern printf
-
-section .data
-format:
-	db "%d\n", 0x0
-
 section .text
 global str_index
 
@@ -69,12 +63,6 @@ str_index:
 	jmp		.end
 
 .end:
-	; printf return value
-	; mov		rdi, format
-	; mov		rsi, rax
-	; mov		rax, printf
-	; call	rax
-
 	; restore stack
 	leave
 	ret
