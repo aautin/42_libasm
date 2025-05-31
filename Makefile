@@ -9,11 +9,11 @@ FILES=	ft_strlen \
 		ft_strdup \
 		errno
 
-
 FILES_BONUS=	ft_list_push_front \
 				ft_list_remove_if \
 				ft_list_size \
-				ft_list_sort
+				ft_list_sort \
+				get_index
 
 MAIN_FILES=	main
 
