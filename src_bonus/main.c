@@ -30,7 +30,7 @@ int	main(int argc, char** argv)
 {
 	t_list*	list = NULL;
 
-	for (int i = 2; i < argc; ++i) {
+	for (int i = argc - 1; i > 1; --i) {
 		t_list*	new = ft_list_new(strdup(argv[i]));
 		ft_list_push_front(&list, new);
 	}
@@ -40,17 +40,25 @@ int	main(int argc, char** argv)
 	t_list* ptr = list;
 	for (int i = 0; ptr != NULL; ++i) {
 		char* data = (char*)ptr->data;
+		printf("[%d] '%s'\n", i, data);
+		ptr = ptr->next;
+	}
+	
+	char *data = argv[1];
+	printf("(Remove if '%s')\n", data);
+	ft_list_remove_if(&list, data, (int (*)(void*, void*))strcmp, &free);
+	
+	ptr = list;
+	for (int i = 0; ptr != NULL; ++i) {
+		char* data = (char*)ptr->data;
 		int	base16 = ft_atoi_base(data, 16);
 		int	base8 = ft_atoi_base(data, 8);
 		printf("[%d] '%s', %d from 16-base, %d from 8-base\n", i, data, base16, base8);
 		ptr = ptr->next;
 	}
 
-	// ft_list_sort(&list, (int (*)(void*, void*))strcmp);
-	// printf("(Bubble Sort)\n");
-	char *data = argv[1];
-	printf("(Remove if %s)\n", data);
-	ft_list_remove_if(&list, data, (int (*)(void*, void*))strcmp, &free);
+	ft_list_sort(&list, (int (*)(void*, void*))strcmp);
+	printf("(Bubble Sort)\n");
 
 	for (int i = 0; list != NULL; ++i) {
 		printf("[%d] '%s'\n", i, (char*)list->data);

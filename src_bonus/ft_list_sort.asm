@@ -8,102 +8,101 @@
 LIST_DATA equ 0x0
 LIST_NEXT equ 0x8
 
+HEAD		equ 0x8
+COMP		equ	0x10
+SORTS_LEFT	equ	0x18
+PREV_L		equ	0x20
+PREV_R		equ	0x28
+
 extern ft_list_size
+extern swap
 
 section .text
 global ft_list_sort
 
 ft_list_sort:
+	; stack managment
 	push	rbp
 	mov		rbp, rsp
+	sub		rsp, 0x28
 
-	sub		rsp, 0x28					; (4 * 8) + (2 * 4) = 40 = 0x28
-	mov		qword [rbp - 0x8], rdi		; t_list**	start_ptr
-	mov		qword [rbp - 0x10], rsi		; int		(*cmp)()
+	; local variables initialisation
+	mov		qword [rbp - HEAD], rdi
+	mov		qword [rbp - COMP], rsi
 	mov		rdi, qword [rdi]
+	mov		rsi, qword [rbp - COMP]
 	call	ft_list_size
-	mov		dword [rbp - 0x14], eax		; int		sorting_loops_nb
+	mov		dword [rbp - SORTS_LEFT], eax
 
-.sort_list:
-	dec		dword [rbp - 0x14]
+	; if ft_list_size < 2 : return 
+	cmp		eax, 2
+	jl		.end
 
-	cmp		dword [rbp - 0x14], 0		; still sorting_loops to do ?
-	jle		.done
+.sort:
+	dec		dword [rbp - SORTS_LEFT]
 
-	mov		dword [rbp - 0x18], 0		; set counter (i < sorting_loops_nb)
-	mov		qword [rbp - 0x20], 0		; set first ptr (previous left operand)
-	mov		rdi, qword [rbp - 0x8]
-	mov		rdi, qword [rdi]
-	mov		qword [rbp - 0x28], rdi		; set second ptr (previous right operand)
+	; if SORTS_LEFT == 0 : return
+	mov		edi, dword [rbp - SORTS_LEFT]
+	cmp		edi, 0
+	je		.end
 
-.sort_element:
-    mov     edi, dword [rbp - 0x18]
-    cmp     edi, dword [rbp - 0x14]
-    jge     .sort_list
+	; PREV pointers initialisation
+	mov		rdi, qword [rbp - HEAD]
+	mov		rsi, qword [rdi]
+	mov		qword [rbp - PREV_L], 0
+	mov		qword [rbp - PREV_R], rsi
 
-    ; Check if second_ptr->next == NULL
-    mov     rax, qword [rbp - 0x28]
-    mov     rax, qword [rax + LIST_NEXT]
-    test    rax, rax
-    je      .sort_list
+; sort_wave order the position of 1 element, must be executed ft_list_size() times
+.sort_wave:
+	; if right operand == 0 : finish this wave
+	mov		rdi, qword [rbp - PREV_R]
+	mov		rdi, qword [rdi + LIST_NEXT]
+	cmp		rdi, 0
+	je		.sort
 
-    ; set rdi on second_ptr->data
-    mov     rdi, qword [rbp - 0x28]
-    mov     rdi, qword [rdi + LIST_DATA]
+	; put left operand in rdi, right operand in rsi
+	mov		rdi, qword [rbp - PREV_R]
+	mov		rdi, qword [rdi + LIST_NEXT]
+	mov		rsi, qword [rbp - PREV_R]
 
-    ; set rsi on second_ptr->next->data
-    mov     rsi, qword [rbp - 0x28]
-    mov     rsi, qword [rsi + LIST_NEXT]
-    mov     rsi, qword [rsi + LIST_DATA]
+	; save PREV_L and PREV_R->NEXT before potential swap
+	mov		r12, qword [rbp - PREV_L]
+	mov		r13, qword [rbp - PREV_R]
+	mov		r13, qword [r13 + LIST_NEXT]
 
-    call    qword [rbp - 0x10]
-
+	; if cmp(left->data, right->data) <= 0 : don't swap
+	mov		rdi, qword [rbp - PREV_R]
+	mov		rdi, qword [rdi + LIST_DATA]
+	mov		rsi, qword [rbp - PREV_R]
+	mov		rsi, qword [rsi + LIST_NEXT]
+	mov		rsi, qword [rsi + LIST_DATA]
+	mov		rax, qword [rbp - COMP]
+	call	rax
 	cmp		eax, 0
-	jg		.swap							; swap if second data greater than first
-
-
-.sort_element_done:
-	; mov the 2 pointers forward
-	mov		rdi, qword [rbp - 0x28]
-	mov		rsi, qword [rbp - 0x28]			; first ptr = second ptr
-	mov		rsi, qword [rsi + LIST_NEXT]	; second ptr = second ptr -> next
-	mov		qword [rbp - 0x20], rdi
-	mov		qword [rbp - 0x28], rsi
-
-	inc		dword [rbp - 0x18]
-	jmp		.sort_element
+	jle		.no_swap
 
 .swap:
-	cmp		qword [rbp - 0x20], 0
-	jne		.swap_then
+	; swap operands and update HEAD element if needed
+	mov		rdi, qword [rbp - HEAD]
+	mov		rsi, qword [rbp - PREV_L]
+	mov		rdx, qword [rbp - PREV_R]
+	call	swap
 
-	; update list_ptr
-	cmove	rsi, qword [rbp - 0x28]
-	cmove	rsi, qword [rsi + LIST_NEXT]
-	cmove	rdi, qword [rbp - 0x8]
-	mov		qword [rdi], rsi
+	; adjust the pointers : PREV_L = saved PREV_R, PREV_R doesn't change
+	mov		qword [rbp - PREV_L], r13
+	jmp		.sort_wave
 
-.swap_then:
-	; save right operand next
-	mov		rdx, qword [rbp - 0x28]
-	mov		rdx, qword [rdx + LIST_NEXT]
-	mov		rdx, qword [rdx + LIST_NEXT]
+.no_swap:
+	; move pointer forward : PREV_L = PREV_R, PREV_R = PREV_R->LIST_NEXT
+	mov		rdi, qword [rbp - PREV_R]
+	mov		qword [rbp - PREV_L], rdi
+	mov		rdi, qword [rbp - PREV_R]
+	mov		rdi, qword [rdi + LIST_NEXT]
+	mov		qword [rbp - PREV_R], rdi
 
-	; make right operand next point on left operand
-	mov		rcx, qword [rbp - 0x28]
-	mov		rcx, qword [rcx + LIST_NEXT]		; rcx is right operand
-	mov		r12, qword [rbp - 0x28]				; r12 is left operand
-	mov		qword [rcx + LIST_NEXT], r12
+	jmp		.sort_wave
 
-	; make left operand next point on the saved right operand next
-	mov		r12, qword [rbp - 0x28]
-	mov		qword [r12 + LIST_NEXT], rdx
-
-.swap_then2:
-	; mov the 2 pointers forward
-	mov		qword [rbp - 0x20], r12
-	jmp		.sort_element_done
-
-.done:
+.end:
+	; restore stack
 	leave
 	ret
