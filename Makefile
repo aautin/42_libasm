@@ -13,7 +13,8 @@ FILES_BONUS=	ft_list_push_front \
 				ft_list_remove_if \
 				ft_list_size \
 				ft_list_sort \
-				get_index
+				ft_atoi_base \
+				str_index
 
 MAIN_FILES=	main
 
