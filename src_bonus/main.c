@@ -9,6 +9,7 @@ typedef struct		s_list
 }					t_list;
 
 // -------- BONUS FUNCS --------
+int		ft_atoi_base(char* str, int base_length);
 void	ft_list_push_front(t_list** begin_list, void* data);
 int 	ft_list_size(t_list *list);
 void 	ft_list_sort(t_list **begin_list, int (*cmp)());
@@ -54,7 +55,10 @@ int	main(int argc, char** argv)
 
 	t_list* ptr = list;
 	for (int i = 0; ptr != NULL; ++i) {
-		printf("[%d] %s\n", i, (char*)ptr->data);
+		char* data = (char*)ptr->data;
+		int	base16 = ft_atoi_base(data, 16);
+		int	base8 = ft_atoi_base(data, 8);
+		printf("[%d] '%s', %d from 16-base, %d from 8-base\n", i, data, base16, base8);
 		ptr = ptr->next;
 	}
 
@@ -65,7 +69,7 @@ int	main(int argc, char** argv)
 	ft_list_remove_if(&list, data, (int (*)(void*, void*))strcmp, &free);
 
 	for (int i = 0; list != NULL; ++i) {
-		printf("[%d] %s\n", i, (char*)list->data);
+		printf("[%d] '%s'\n", i, (char*)list->data);
 		list = ft_list_delone(list);
 	}
 
