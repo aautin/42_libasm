@@ -22,9 +22,9 @@ MAIN_FILES=	main
 INC_DIR=inc
 
 SRC_DIR=src
-SRC= $(addsuffix .asm, $(addprefix $(SRC_DIR)/, $(FILES)))
+SRC= $(addsuffix .s, $(addprefix $(SRC_DIR)/, $(FILES)))
 SRC_BONUS_DIR=src_bonus
-SRC_BONUS= $(addsuffix .asm, $(addprefix $(SRC_BONUS_DIR)/, $(FILES_BONUS)))
+SRC_BONUS= $(addsuffix .s, $(addprefix $(SRC_BONUS_DIR)/, $(FILES_BONUS)))
 
 OBJ_DIR=obj
 OBJ= $(addsuffix .o, $(addprefix $(OBJ_DIR)/, $(FILES)))
@@ -41,28 +41,29 @@ TESTER_BONUS=tester_bonus
 CC= nasm
 CFLAGS= -f elf64 -g -F dwarf
 
+.PHONY: all bonus clean fclean re
+
 all: $(NAME)
 bonus: $(NAME_BONUS)
-.PHONY: all bonus clean fclean re
 
 $(NAME): $(OBJ_DIR) $(OBJ)
 	ar rcs $@ $(OBJ)
-$(NAME_BONUS): $(OBJ_BONUS_DIR) $(OBJ_BONUS)
-	ar rcs $@ $(OBJ_BONUS)
+$(NAME_BONUS): $(OBJ_BONUS_DIR) $(OBJ_BONUS) $(OBJ_DIR) $(OBJ)
+	ar rcs $@ $(OBJ_BONUS) $(OBJ)
 
 $(OBJ_DIR):
 	mkdir -p $@
 $(OBJ_BONUS_DIR):
 	mkdir -p $@
 
-obj/main.o: src/main.asm
+obj/main.o: src/main.s
 	$(CC) $(CFLAGS) -o $@ $<
 obj_bonus/main.o: src_bonus/main.c
-	gcc -fPIE -pie -g -c $^ -o $@ -I$(INC_DIR)
+	gcc -z noexecstack -fPIE -pie -g -c $^ -o $@ -I$(INC_DIR)
 
-obj/%.o: src/%.asm
+obj/%.o: src/%.s
 	$(CC) $(CFLAGS) -o $@ $<
-obj_bonus/%.o: src_bonus/%.asm
+obj_bonus/%.o: src_bonus/%.s
 	$(CC) $(CFLAGS) -o $@ $<
 
 clean:
