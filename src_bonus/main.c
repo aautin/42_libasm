@@ -28,9 +28,12 @@ static t_list*	ft_list_delone(t_list*	element)
 
 int	main(int argc, char** argv)
 {
+	if (argc < 3)
+		return (0);
+
 	t_list*	list = NULL;
 
-	for (int i = argc - 1; i > 1; --i) {
+	for (int i = argc - 1; i > 2; --i) {
 		t_list*	new = ft_list_new(strdup(argv[i]));
 		ft_list_push_front(&list, new);
 	}
@@ -51,9 +54,8 @@ int	main(int argc, char** argv)
 	ptr = list;
 	for (int i = 0; ptr != NULL; ++i) {
 		char* data = (char*)ptr->data;
-		int	base16 = ft_atoi_base(data, 16);
-		int	base8 = ft_atoi_base(data, 8);
-		printf("[%d] '%s', %d from 16-base, %d from 8-base\n", i, data, base16, base8);
+		int	res = ft_atoi_base(data, argv[2]);
+		printf("[%d] '%s', %d from base\n", i, data, res);
 		ptr = ptr->next;
 	}
 

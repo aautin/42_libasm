@@ -1,16 +1,18 @@
-; int	ft_atoi_base(char* str, int base_length)
+; int	ft_atoi_base(char* str, char* base)
 
 STRING		equ 0x8
-BASE_LEN	equ 0xc
-MINUS		equ 0x10
-BASE		equ 0x18
-RES			equ 0x20
+BASE		equ 0x10
+MINUS		equ 0x18
+BASE_LEN	equ 0x20
+RES			equ 0x28
 
 extern str_index
+extern ft_strlen
 
-section .data
-base:
+data:
 	db "0123456789abcdef", 0x0
+map:
+	TIMES 255 db 0x0
 
 section .text
 global ft_atoi_base
@@ -19,21 +21,54 @@ ft_atoi_base:
 	; stack managment
 	push	rbp
 	mov		rbp, rsp
-	sub		rsp, 0x20
+	sub		rsp, 0x28
 
 	; local variables initialisation
 	mov		qword [rbp - STRING], rdi		; STRING = str
-	mov		dword [rbp - BASE_LEN], esi		; BASE_LEN = base_length
+	mov		qword [rbp - BASE], rsi			; BASE = base
 	mov		byte [rbp - MINUS], 0			; MINUS = 0
-	lea     rax, [rel base]
-	mov		qword [rbp - BASE], rax			; BASE = base
+	mov		rdi, qword [rbp - BASE]
+	call	ft_strlen
+	mov		dword [rbp - BASE_LEN], eax		; BASE_LEN = ft_strlen(BASE)
 	mov		dword [rbp - RES], 0			; RES = 0
 
-	; return 0 if BASE_LEN is in [1, 16]
-	cmp		dword [rbp - BASE_LEN], 1
+	; return 0 if BASE_LEN is in [2, 16]
+	cmp		dword [rbp - BASE_LEN], 2
 	jl		.end
-	cmp		dword [rbp - BASE_LEN], 16
-	jg		.end
+
+	; rdi is a pointer on the base
+	mov		rdi, qword [rbp - BASE]
+
+.check_base:
+	; while not the end of the base -> keep going on parsing
+	cmp		byte [rdi], 0
+	je		.spaces_loop
+
+	; if *base == '-' or *base == '+' or *base == ' ': return 0
+	cmp		byte [rdi], 0x2d
+	je		.end
+	cmp		byte [rdi], 0x2b
+	je		.end
+	cmp		byte [rdi], 0x20
+	je		.end
+
+	; if *base is in the map, it's a duplicate : return 0
+	; To be continued...
+	; store *base in the map
+	; To be continued...
+
+	; if *base < '\t' or *base > '\r' : not isspace
+	cmp		byte [rdi], 0x9
+	jl		.check_base_end
+	cmp		byte [rdi], 0xd
+	jg		.check_base_end
+
+	; otherwise, it's an isspace : return 0
+	jmp		.end
+
+.check_base_end:
+	inc		rdi
+	jmp		.check_base
 
 .spaces_loop:
 	; if *STRING == 0
@@ -42,7 +77,7 @@ ft_atoi_base:
 	je		.end
 
 	; if *STRING == ' ' : isspace
-	cmp		rdi, qword [rbp - STRING]
+	mov		rdi, qword [rbp - STRING]
 	cmp		byte [rdi], 0x20
 	je		.isspace
 
