@@ -9,10 +9,11 @@ RES			equ 0x28
 extern str_index
 extern ft_strlen
 
-data:
-	db "0123456789abcdef", 0x0
+section .data
 map:
 	TIMES 255 db 0x0
+map_backup:
+	TIMES 256 db 0
 
 section .text
 global ft_atoi_base
@@ -53,9 +54,14 @@ ft_atoi_base:
 	je		.end
 
 	; if *base is in the map, it's a duplicate : return 0
-	; To be continued...
+	movzx	rsi, byte [rdi]
+	lea     rdx, [rel map]
+	cmp		byte [rdx + rsi], 1
+	je		.end
+
 	; store *base in the map
-	; To be continued...
+	lea     rdx, [rel map]
+	mov		byte [rdx + rsi], 1
 
 	; if *base < '\t' or *base > '\r' : not isspace
 	cmp		byte [rdi], 0x9
@@ -147,6 +153,12 @@ ft_atoi_base:
 	imul    eax, eax, -1
 
 .return:
+	; restore the initial values of map from map_backup
+	lea		rsi, [rel map_backup]
+	lea		rdi, [rel map]
+	mov		rcx, 256
+	rep		movsb
+
 	; restore stack
 	leave
 	ret
