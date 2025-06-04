@@ -11,7 +11,7 @@ extern ft_strlen
 
 section .data
 map:
-	TIMES 255 db 0x0
+	TIMES 256 db 0x0
 map_backup:
 	TIMES 256 db 0
 
