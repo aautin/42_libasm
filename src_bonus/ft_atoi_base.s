@@ -90,12 +90,12 @@ ft_atoi_base:
 	; if *STRING < '\t' : not isspace
 	cmp		rdi, qword [rbp - STRING]
 	cmp		byte [rdi], 0x9
-	jl		.minus
+	jl		.sign
 
 	; if *STRING > '\r' : not isspace
 	cmp		rdi, qword [rbp - STRING]
 	cmp		byte [rdi], 0xd
-	jg		.minus
+	jg		.sign
 
 	jmp		.isspace
 
@@ -103,15 +103,36 @@ ft_atoi_base:
 	inc		qword [rbp - STRING]
 	jmp		.spaces_loop
 
-.minus:
-	; if *STRING != '-'
+.sign:
+	; if *STRING == '-'
 	mov		rdi, qword [rbp - STRING]
 	cmp		byte [rdi], 0x2d
-	jne		.loop
+	je		.minus
 
-	; MINUS = 1 and STR++
-	mov		byte [rbp - MINUS], 1
+	; else if *STRING == '+'
+	mov		rdi, qword [rbp - STRING]
+	cmp		byte [rdi],  0x2b
+	je		.plus
+
+	; else : go to loop
+	jmp		.loop
+
+.plus:
+	; STR++
 	inc		qword [rbp - STRING]
+	jmp		.sign
+
+.minus:
+	; MINUS = (MINUS = 1) ? 0 : 1
+	mov		edx, 0
+	mov		eax, 1
+	cmp		byte [rbp - MINUS], 0
+	cmove	edx, eax
+	mov		byte[rbp - MINUS], dl
+
+	; STR++
+	inc		qword [rbp - STRING]
+	jmp		.sign
 
 .loop:
 	; while *str != 0
@@ -150,7 +171,7 @@ ft_atoi_base:
 	; optionally apply minus
 	cmp		byte [rbp - MINUS], 1
 	jne		.return
-	imul    eax, eax, -1
+	imul	eax, eax, -1
 
 .return:
 	; restore the initial values of map from map_backup
