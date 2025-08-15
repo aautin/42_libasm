@@ -26,6 +26,11 @@ ft_list_sort:
 	mov		rbp, rsp
 	sub		rsp, 0x28
 
+	cmp 	rdi, 0
+	je		.end
+	cmp 	rsi, 0
+	je		.end
+
 	; local variables initialisation
 	mov		qword [rbp - HEAD], rdi
 	mov		qword [rbp - COMP], rsi

@@ -10,7 +10,7 @@ set_errno:
 	mov		rsi, __errno_location
 	call	rsi
 
-	mov		dword [rax], 12
+	mov		dword [rax], edi
 
 	leave
 	ret

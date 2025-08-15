@@ -24,6 +24,11 @@ ft_atoi_base:
 	mov		rbp, rsp
 	sub		rsp, 0x28
 
+	cmp		rdi, 0
+	je		.error
+	cmp		rsi, 0
+	je		.error
+
 	; local variables initialisation
 	mov		qword [rbp - STRING], rdi		; STRING = str
 	mov		qword [rbp - BASE], rsi			; BASE = base
@@ -181,5 +186,10 @@ ft_atoi_base:
 	rep		movsb
 
 	; restore stack
+	leave
+	ret
+
+.error:
+	mov		rax, 0
 	leave
 	ret

@@ -24,6 +24,16 @@ ft_list_remove_if:
 	; stack managment
 	push	rbp
 	mov		rbp, rsp
+
+	cmp 	rdi, 0
+	je		.end
+	cmp 	rsi, 0
+	je		.end
+	cmp		rdx, 0
+	je		.end
+	cmp		rcx, 0
+	je		.end
+
 	sub		rsp, 0x30
 
 	; local variables initialisation

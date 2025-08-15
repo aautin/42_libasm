@@ -10,7 +10,10 @@ global ft_strdup
 ft_strdup:
 	push	rbp
 	mov		rbp, rsp
-	
+
+	cmp		rdi, 0
+	je		.nullerror
+
 	sub		rsp, 0x10
 	mov		[rbp - 0x10], rdi
 
@@ -38,6 +41,11 @@ ft_strdup:
 	mov		rdi, 12
 	call	set_errno
 
+	mov		rax, 0
+	leave
+	ret
+
+.nullerror:
 	mov		rax, 0
 	leave
 	ret

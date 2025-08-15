@@ -15,6 +15,9 @@ ft_list_push_front:
 	push	rbp
 	mov		rbp, rsp
 
+	cmp		rsi, 0
+	je		.done
+
 	mov		rdx, qword [rdi]
 	cmp		rdx, 0
 	je		.no_list
